@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+    <html lang="en">
+    
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Realtime location tracker</title>
+    
+        <!-- leaflet css  -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+            }
+    
+            #map {
+                width: 100%;
+                height: 1000px;
+                z-index: 1;
+            }
+            .main-div{
+                width: 25%;
+                height: 800px;
+                position: absolute;
+                background-color: white;
+                top: 10%;
+                right: 10px;
+                z-index: 2;
+                border-radius: 10px;
+                opacity: 0;
+                pointer-events: none;
+            }
+            .main-div button{
+                width: 100%;
+                height: 50px;
+                border: none;
+                border-bottom: 1px solid black;
+                background-color: transparent;
+            }
+            .main-div p{
+                
+                text-align: center;
+                /* display: none;
+                pointer-events: none; */
+            }
+            .main-div h3{
+                text-align: center;
+            }
+            .map-image1{
+                width: 100%;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+            }
+            .navigation-bar button{
+                height: 30px;
+                margin: 10px 0 0 30px;
+                border: none;
+                background: transparent;
+                font-size: 1rem;
+            }
+            .navigation-bar{
+                position: sticky;
+                background-color: whitesmoke;
+                height: 50px;
+                display: flex
+            }
+            .navigation-bar button:hover{
+                color: red;
+                font-size: 1.3rem;
+            }
+            .change-prop{
+                opacity: 1;
+                pointer-events: all;
+                
+            }
+        </style>
+    </head>
+    
+    <body>
+        <nav class="navigation-bar">
+            <button class="menu-button">Menu</button>
+            <button>Vehicals</button>
+            <button>Add New Vehical</button>
+        </nav>
+        
+        <div class="main-div">
+            
+           <button id="rightnow">Where is the vehicle right now ?</button>
+           <button id="past">Where did all the vehicles go in the past</button>
+           <button id="average">What was the average speed of the vehicle</button>
+           <button id="overspeeding">Did it do overspeeding</button>
+           <button id="travelled">What was the distance travelled by the vehicle</button>
+           <button id="tim"> Distnce travelled by the vehicle in a selected time period</button>
+           <button>Average speed of the vehicle in a selected time</button>
+           <button>Did the vehicle do overspeeding in the specific time</button>
+
+
+
+
+
+
+
+           <h3>Distance travelled till now</h3>
+           <p>26km</p>
+           <h3>Average Speed</h3>
+           <p>55kmpl</p>
+        </div>
+        <div id="map"></div>
+
+    </body>
+    </html>
+    
+    <!-- leaflet js  -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        console.log("err")
+        document.querySelector(".menu-button").addEventListener('click', function(   ){
+            document.querySelector(".main-div").classList.toggle("change-prop");
+
+        });
+
+        // l1 = 18.501211;
+        // l2 =  73.860513;
+        // var data = {
+        //     lat: "18.5204303 ",
+        //     lon: "73.8567437",
+        //     accuracy:"9372.322548122693",
+        //     key: "1"
+        // }
+        // Map initialization 
+        //14.0860746, 100.608406
+        var map = L.map('map').setView([18.54614,73.8805677], 13);
+        
+        //osm layer
+        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        osm.addTo(map);
+    
+        
+        getPosition();
+        
+
+        var marker, circle;
+       
+        function getPosition(position){
+            //time pass
+
+            const latLon = [[18.541706, 73.884019],
+            [18.542322, 73.883930],
+            [18.542943, 73.883805],
+            [18.543403, 73.883679],
+            [18.543896, 73.883544]];
+
+                //Fetch coordinates above this code ------------------------------
+            //     const latLon = 
+            //     [[18.541706, 73.884019],
+            //     [18.542322, 73.883930],
+            //     [18.542943, 73.883805],
+            //     [18.543403, 73.883679],
+            //     [18.543896, 73.883544]];
+
+            // // 
+
+
+            var i =0;
+          
+            var ine = setInterval(()=>{    
+                var laty = latLon[i][0];
+                var longy = latLon[i][1];
+                console.log(laty);
+                console.log(longy);
+                i += 1;
+                var lat =  laty;
+                var long = longy;
+                
+                var accuracy = 90;
+        
+                if(marker) {
+                    map.removeLayer(marker)
+                }
+        
+                if(circle) {
+                    map.removeLayer(circle)
+                }
+        
+                marker = L.marker([lat, long])
+                circle = L.circle([lat, long], {radius: accuracy})
+        
+                var featureGroup = L.featureGroup([marker, circle]).addTo(map)
+                
+
+        
+                map.fitBounds(featureGroup.getBounds())
+        
+                console.log("Your coordinate is: Lat: "+ lat +" Long: "+ long+ " Accuracy: "+ accuracy)
+                if(i==latLon.length){
+                    clearInterval(ine);
+                }
+                }, 2000);
+                
+
+            
+
+
+            
+            //time pass close
+
+
+            // var lat =  document.getElementById("lat").value;
+            // var long = document.getElementById("lot").value;
+            
+            // var accuracy = document.getElementById("acc").value;
+    
+            // if(marker) {
+            //     map.removeLayer(marker)
+            // }
+    
+            // if(circle) {
+            //     map.removeLayer(circle)
+            // }
+    
+            // marker = L.marker([lat, long])
+            // circle = L.circle([lat, long], {radius: accuracy})
+    
+            // var featureGroup = L.featureGroup([marker, circle]).addTo(map)
+            
+
+    
+            // map.fitBounds(featureGroup.getBounds())
+    
+            // console.log("Your coordinate is: Lat: "+ lat +" Long: "+ long+ " Accuracy: "+ accuracy)
+
+
+            
+        }
+    
+    </script>
